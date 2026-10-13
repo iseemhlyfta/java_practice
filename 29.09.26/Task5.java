@@ -92,7 +92,7 @@ public class Task5 {
 
     public static void printAboutDeveloper() {
         System.out.println();
-        System.out.println("Разработчик: студент 1 курса");
+        System.out.println("Разработчик: Кнутарев Тимофей Игоревич");
     }
 
     public static void main(String[] args) {
