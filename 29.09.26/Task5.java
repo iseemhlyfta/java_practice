@@ -1,56 +1,97 @@
 import java.util.Scanner;
 
 public class Task5 {
-    static Scanner in = new Scanner(System.in);
+    static Scanner scanner = new Scanner(System.in);
 
     public static void printMenu() {
         System.out.println();
+        System.out.println("===== Калькулятор ИМТ =====");
         System.out.println("1 - Выполнить расчёт");
         System.out.println("2 - Информация о программе");
         System.out.println("3 - Информация о разработчике");
         System.out.println("0 - Выход");
-        System.out.print("Выберите пункт: ");
+        System.out.print("Выберите пункт меню: ");
     }
 
-    public static double readNumber(String text) {
+    public static double readNumber(String text, double min, double max, String errorText) {
         while (true) {
             System.out.print(text);
-            String s = in.nextLine().trim().replace(',', '.');
-            try {
-                return Double.parseDouble(s);
-            } catch (NumberFormatException e) {
-                System.out.println("Ошибка ввода, нужно ввести число. Попробуйте ещё раз.");
+            String line = scanner.nextLine().trim();
+            if (line.equalsIgnoreCase("q")) {
+                return -1;
             }
+            line = line.replace(',', '.');
+            double number;
+            try {
+                number = Double.parseDouble(line);
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: нужно ввести число. Попробуйте ещё раз (q - выход в меню).");
+                continue;
+            }
+            if (number <= min || number > max) {
+                System.out.println(errorText + " Попробуйте ещё раз (q - выход в меню).");
+                continue;
+            }
+            return number;
         }
     }
 
-    public static double perimeter(double x1, double y1, double x2, double y2) {
-        double width = Math.abs(x2 - x1);
-        double height = Math.abs(y1 - y2);
-        return 2 * (width + height);
+    public static double calculateImt(double weight, double height) {
+        return weight / (height * height);
+    }
+
+    public static String getCategory(double imt) {
+        if (imt < 18.5) {
+            return "Недостаточная масса тела";
+        } else if (imt < 25.0) {
+            return "Норма";
+        } else if (imt < 30.0) {
+            return "Избыточная масса тела";
+        } else if (imt < 35.0) {
+            return "Ожирение I степени";
+        } else if (imt < 40.0) {
+            return "Ожирение II степени";
+        } else {
+            return "Ожирение III степени";
+        }
+    }
+
+    public static void printResult(double imt) {
+        System.out.println();
+        System.out.printf("Ваш индекс массы тела (ИМТ): %.2f%n", imt);
+        System.out.println("Категория: " + getCategory(imt));
     }
 
     public static void calculate() {
-        double x1 = readNumber("Введите x1 (левая верхняя вершина): ");
-        double y1 = readNumber("Введите y1 (левая верхняя вершина): ");
-        double x2 = readNumber("Введите x2 (правая нижняя вершина): ");
-        double y2 = readNumber("Введите y2 (правая нижняя вершина): ");
-        while (x1 >= x2 || y1 <= y2) {
-            System.out.println("Первая точка должна быть левее и выше второй. Введите координаты заново.");
-            x1 = readNumber("Введите x1 (левая верхняя вершина): ");
-            y1 = readNumber("Введите y1 (левая верхняя вершина): ");
-            x2 = readNumber("Введите x2 (правая нижняя вершина): ");
-            y2 = readNumber("Введите y2 (правая нижняя вершина): ");
+        System.out.println();
+        System.out.println("Формула расчета: ИМТ = вес / (рост * рост)");
+        System.out.println();
+
+        double weight = readNumber("Введите ваш вес в кг (например, 70): ", 0, 500,
+                "Вес должен быть больше 0 и не больше 500 кг.");
+        if (weight == -1) {
+            return;
         }
-        System.out.println("Периметр прямоугольника = " + perimeter(x1, y1, x2, y2));
+
+        double height = readNumber("Введите ваш рост в метрах (например, 1,75): ", 0, 3.0,
+                "Рост должен быть больше 0 и не больше 3 м (например, 1,75, а не 175).");
+        if (height == -1) {
+            return;
+        }
+
+        double imt = calculateImt(weight, height);
+        printResult(imt);
     }
 
-    public static void aboutProgram() {
-        System.out.println("Программа считает периметр прямоугольника");
-        System.out.println("по координатам левой верхней и правой нижней вершин.");
+    public static void printAboutProgram() {
+        System.out.println();
+        System.out.println("Программа считает индекс массы тела (ИМТ)");
+        System.out.println("по весу и росту и определяет категорию массы тела.");
+        System.out.println("При вводе данных можно ввести q, чтобы вернуться в меню.");
     }
 
-    public static void aboutDeveloper() {
+    public static void printAboutDeveloper() {
+        System.out.println();
         System.out.println("Разработчик: студент 1 курса");
     }
 
@@ -58,23 +99,23 @@ public class Task5 {
         boolean running = true;
         while (running) {
             printMenu();
-            String choice = in.nextLine().trim();
+            String choice = scanner.nextLine().trim();
             switch (choice) {
                 case "1":
                     calculate();
                     break;
                 case "2":
-                    aboutProgram();
+                    printAboutProgram();
                     break;
                 case "3":
-                    aboutDeveloper();
+                    printAboutDeveloper();
                     break;
                 case "0":
                     running = false;
-                    System.out.println("До свидания!");
+                    System.out.println("Программа завершена.");
                     break;
                 default:
-                    System.out.println("Нет такого пункта, попробуйте ещё раз.");
+                    System.out.println("Такого пункта нет. Попробуйте ещё раз.");
             }
         }
     }
